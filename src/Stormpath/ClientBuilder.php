@@ -17,6 +17,7 @@ namespace Stormpath;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+use Stormpath\Cache\CacheManager;
 use Stormpath\Http\DefaultRequest;
 use Stormpath\Http\HttpClientRequestExecutor;
 use Stormpath\Http\Request;
@@ -50,6 +51,7 @@ class ClientBuilder extends Magic
     private $apiKeySecretPropertyName = "apiKey.secret";
     private $apiKeyProperties;
     private $apiKeyFileLocation;
+    private $cacheManager;
     private $baseURL;
 
     /**
@@ -201,6 +203,12 @@ class ClientBuilder extends Magic
     public function setApiKeyProperties($apiKeyProperties)
     {
         $this->apiKeyProperties = $apiKeyProperties;
+        return $this;
+    }
+
+    public function setCacheManager(CacheManager $cacheManager)
+    {
+        $this->cacheManager = $cacheManager;
         return $this;
     }
 
