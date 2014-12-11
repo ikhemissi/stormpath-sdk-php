@@ -7,12 +7,13 @@ class MemcachedManager implements CacheManager {
 
     public function getCache()
     {
-        // TODO: Implement getCache() method.
+        return new MemcachedCache($this->servers);
     }
 
     public function addServer($host, $port, $weight)
     {
-        $this->servers = array_merge($this->servers, array('host' => $host, 'port' => $port, 'weight' => $weight));
+        $this->servers[] = array('host' => $host, 'port' => $port, 'weight' => $weight);
+
         return $this;
     }
 }

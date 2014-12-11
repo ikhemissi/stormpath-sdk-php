@@ -18,6 +18,7 @@ namespace Stormpath\DataStore;
  * limitations under the License.
  */
 
+use Stormpath\Cache\CacheManager;
 use Stormpath\Http\DefaultRequest;
 use Stormpath\Http\Request;
 use Stormpath\Http\RequestExecutor;
@@ -32,12 +33,15 @@ class DefaultDataStore implements InternalDataStore
     private $requestExecutor;
     private $resourceFactory;
     private $baseUrl;
+    private $cacheManager;
 
     const DEFAULT_SERVER_HOST = 'api.stormpath.com';
     const DEFAULT_API_VERSION = '1';
 
-    public function __construct(RequestExecutor $requestExecutor, $baseUrl = null)
+    public function __construct(RequestExecutor $requestExecutor, CacheManager $cacheManager, $baseUrl = null)
     {
+        $this->cacheManager = $cacheManager;
+        $this->cache = $this->cacheManager->getCache();
         $this->requestExecutor = $requestExecutor;
         $this->resourceFactory = new DefaultResourceFactory($this);
 
@@ -96,10 +100,19 @@ class DefaultDataStore implements InternalDataStore
             $href = $this->qualify($href);
         }
 
+
+        if($this->hasCache($href)) {
+            return $this->cache->get($href);
+        }
+
         $queryString = $this->getQueryString($options);
         $data = $this->executeRequest(Request::METHOD_GET, $href, '', $queryString);
 
-        return $this->resourceFactory->instantiate($className, array($data, $queryString));
+        $return = $this->resourceFactory->instantiate($className, array($data, $queryString));
+
+        $this->cache->put($href, $return);
+
+        return $return;
     }
 
     public function create($parentHref, Resource $resource, $returnType, array $options = array())
@@ -285,5 +298,10 @@ class DefaultDataStore implements InternalDataStore
         }
 
         return $query;
+    }
+
+    private function hasCache($key)
+    {
+        return $this->cache->has($key);
     }
 }

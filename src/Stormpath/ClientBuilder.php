@@ -246,7 +246,7 @@ class ClientBuilder extends Magic
 
         $apiKey = new ApiKey($apiKeyId, $apiKeySecret);
 
-        return new Client($apiKey, $this->baseURL);
+        return new Client($apiKey, $this->cacheManager, $this->baseURL);
     }
 
     public function setBaseURL($baseURL)

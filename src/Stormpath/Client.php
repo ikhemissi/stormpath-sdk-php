@@ -18,6 +18,7 @@ namespace Stormpath;
  * limitations under the License.
  */
 
+use Stormpath\Cache\CacheManager;
 use Stormpath\DataStore\DefaultDataStore;
 use Stormpath\Http\HttpClientRequestExecutor;
 use Stormpath\Resource\Resource;
@@ -84,21 +85,25 @@ class Client extends Magic
 
     private $dataStore;
 
+
     /**
      * Instantiates a new Client instance that will communicate with the Stormpath REST API.
      * See the class-level PHPDoc for a usage example.
      *
-     * @param $apiKey the Stormpath account API Key that will be used to authenticate the client with
+     * @param ApiKey|the $apiKey the Stormpath account API Key that will be used to authenticate the client with
      *               Stormpath's REST API.
+     *
+     * @param CacheManager $cacheManager
      *
      * @param $baseUrl optional parameter for specifying the base URL when not using the default one
      *         (https://api.stormpath.com/v1).
      */
-    public function __construct(ApiKey $apiKey, $baseUrl = null)
+    public function __construct(ApiKey $apiKey, CacheManager $cacheManager, $baseUrl = null)
     {
         parent::__construct();
         $requestExecutor = new HttpClientRequestExecutor($apiKey);
-        $this->dataStore = new DefaultDataStore($requestExecutor, $baseUrl);
+        $this->dataStore = new DefaultDataStore($requestExecutor, $cacheManager, $baseUrl);
+
     }
 
     public static function get($href, $className, $path = null, array $options = array())

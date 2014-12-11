@@ -23,9 +23,10 @@ class MemcachedCache implements Cache {
      * @param  string      $prefix
      * @return void
      */
-    public function __construct($memcached, $prefix = 'stormpath')
+    public function __construct(Array $servers, $prefix = 'stormpath')
     {
-        $this->memcached = $memcached;
+        $this->memcached = new Memcached();
+        $this->memcached->addServers($servers);
         $this->prefix = $prefix;
     }
 
@@ -52,7 +53,7 @@ class MemcachedCache implements Cache {
      * @param  int $minutes
      * @return void
      */
-    public function put($key, $value, $minutes)
+    public function put($key, $value, $minutes = 120)
     {
         $this->memcached->set($this->prefix.$key, $value, $minutes * 60);
     }
@@ -76,5 +77,10 @@ class MemcachedCache implements Cache {
     public function clear()
     {
         $this->memcached->flush();
+    }
+
+    public function has($key) {
+        var_dump($this->memcached->getAllKeys());
+        return self::get($key) ? true : false;
     }
 }
